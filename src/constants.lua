@@ -15,7 +15,7 @@ rm_f=112
 
 -- bullets / revolver
 blt_spd=3
-blt_spr=6 -- sprite index for bullet
+blt_spr=12 -- sprite index for bullet
 blt_life=120 -- frames before despawn
 gun_max=6 -- revolver capacity
 gun_cd_max=8 -- delay between shots (~0.27s at 30fps)

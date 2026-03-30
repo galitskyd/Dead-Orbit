@@ -4,7 +4,7 @@ particles={}
 function spawn_dust(x,y)
  for i=1,5 do
   add(particles,{
-   x=x+rnd(8),
+   x=x+rnd(16),
    y=y,
    vx=rnd(2)-1,
    vy=-rnd(1),

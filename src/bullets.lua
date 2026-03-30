@@ -9,9 +9,9 @@ function spawn_bullet()
 
  -- offset spawn to front of player
  if p.facing==1 then
-  bx=p.x+p.w
+  bx=p.x+p.w+1
  else
-  bx=p.x-4
+  bx=p.x-5
  end
 
  -- angled shot during slide

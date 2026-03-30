@@ -3,9 +3,9 @@ p={}
 
 function init_player()
  p.x=56
- p.y=rm_f-8
- p.w=8
- p.h=8
+ p.y=rm_f-16
+ p.w=16
+ p.h=16
  p.vx=0
  p.vy=0
  p.grounded=true
@@ -130,13 +130,14 @@ function update_player()
  -- animation
  p.anim_t=(p.anim_t+1)%120
  if p.sliding then
-  p.spr=5 -- slide sprite
+  p.spr=10
  elseif not p.grounded then
-  p.spr=3
+  p.spr=8
  elseif p.crouching then
-  p.spr=4
+  p.spr=6
  elseif moving then
-  p.spr=1+flr(p.anim_t/6)%2
+  local f=flr(p.anim_t/6)%2
+  p.spr=2+f*2 -- 2 or 4
  else
   p.spr=0
  end
@@ -147,13 +148,13 @@ function draw_player()
  if p.iframe_t>0 and p.anim_t%4<2 then
   return
  end
- spr(p.spr,p.x,p.y,1,1,p.facing==-1)
+ spr(p.spr,p.x,p.y,2,2,p.facing==-1)
 
  -- reload bar above head
  if p.reloading then
-  local bx=p.x-1
+  local bx=p.x+2
   local by=p.y-5
-  local bw=10
+  local bw=12
   local pct=1-p.reload_t/reload_dur
   rect(bx,by,bx+bw,by+2,7)
   rectfill(bx+1,by+1,bx+flr(pct*(bw-1)),by+1,11)
