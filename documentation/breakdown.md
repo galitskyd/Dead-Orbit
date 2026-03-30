@@ -34,25 +34,25 @@ Each session below is a self-contained Claude Code prompt scope. Before starting
 
 ## Session 2 — Core Combat Loop
 
-**Assets:** Bullet sprite only
+**Assets:** Bullet sprite (user creates in Pico-8 — see sprite note below)
 
 **Prompt scope:**
-- Render a dotted line from player origin to crosshair showing shot trajectory
-- ↑/↓ arrows adjust aim angle; dotted line updates in real time
-- F key fires one bullet per tap (semi-auto); bullet travels and despawns on wall hit
+- F key fires one bullet per tap (semi-auto); bullet spawns in front of player in facing direction, travels in a straight line, despawns on wall hit or off-screen
+- Shots can be fired while standing, jumping, crouching, and sliding
+- While sliding, shots fire upward at an angle (diagonal in facing direction)
+- All other states: shots fire straight horizontally in facing direction
 - Space triggers ground-only horizontal slide:
-  - Aim angle locks at slide start
-  - Dotted line shows locked angle during slide
   - I-frames active for ~1s
-  - Player can tap F to fire during slide
+  - Player can tap F to fire during slide (angled shot)
   - 1.5s cooldown after slide; small HUD indicator bottom-right
-- Generate placeholder bullet sprite in `__gfx__`
+- **Sprite note:** Do NOT modify `__gfx__` data. Instead, document which sprite index the bullet should occupy so the user can draw it in Pico-8's sprite editor
 
 **Verify before continuing:**
-- Dotted line tracks aim angle accurately
-- Bullets travel in the correct direction
+- Bullets spawn from correct position in front of player
+- Bullets travel straight when standing, jumping, or crouching
+- Bullets fire at an upward angle during slide
 - Slide I-frames pass through a test projectile (add a static test bullet to verify)
-- Firing during slide works and follows locked angle
+- Firing during slide works with angled trajectory
 - Cooldown indicator fills correctly
 
 ---
@@ -64,8 +64,7 @@ Each session below is a self-contained Claude Code prompt scope. Before starting
 **Prompt scope:**
 - Hold X to enter Deadeye: game time slows to ~10% speed
 - Deadeye meter (0–100) drains while X is held, refills passively at normal rate
-- Dotted line remains active and responsive to ↑/↓ during Deadeye
-- Player can still tap F to fire during Deadeye
+- Player can still move, shoot, and slide during Deadeye
 - Add Deadeye meter to HUD (top-center); pulses when full
 
 **Verify before continuing:**
@@ -144,14 +143,14 @@ Each session below is a self-contained Claude Code prompt scope. Before starting
 - Gun icon + ammo count top-right
 - Item slots top-right (below ammo)
 - Slide cooldown indicator bottom-right (circle fills over 1.5s)
-- Confirm dotted line does not visually conflict with any HUD element
+- Confirm shooting visuals do not conflict with any HUD element
 - Generate HUD sprites in `__gfx__`
 
 **Verify before continuing:**
 - All HUD elements visible and accurate during active gameplay
 - Taking damage updates hearts immediately
 - Firing updates ammo count correctly
-- No visual overlap between HUD and dotted line
+- No visual overlap between HUD elements
 
 ---
 

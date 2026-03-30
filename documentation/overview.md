@@ -18,8 +18,8 @@ Uses `stat(28)` raw keyboard scanning for WASD + F + Space, combined with PICO-8
 | Move left / right | A / D | |
 | Jump | W | |
 | Crouch | S | |
-| Aim up | ↑ | shifts shot angle upward |
-| Aim down | ↓ | shifts shot angle downward |
+| ~~Aim up~~ | ~~↑~~ | removed — shots are fixed direction |
+| ~~Aim down~~ | ~~↓~~ | removed — shots are fixed direction |
 | Fire | F | semi-auto, one tap = one shot |
 | Slide | Space | ground only, 1.5s cooldown, ~1s I-frames |
 | Reload | R | ~1s, player vulnerable, can't slide during |
@@ -28,34 +28,32 @@ Uses `stat(28)` raw keyboard scanning for WASD + F + Space, combined with PICO-8
 
 ---
 
-## Core Mechanic 1: Semi-Auto Gunplay + Shot Guideline
+## Core Mechanic 1: Semi-Auto Gunplay
 
 - Every tap of **F** fires one shot — no holding, no spray
-- A **dotted line** extends from the player to a crosshair at all times, showing exact bullet trajectory
-- Aim angle adjusted with ↑/↓ — dotted line updates in real time
+- Bullets fire straight horizontally in the player's facing direction
+- Player can shoot while standing, jumping, crouching, and sliding
+- While sliding, shots fire upward at an angle (diagonal in facing direction)
 - Each weapon has its own fire rate cap
 - Reload is manual: **R** while crouching, ~1s, leaves player exposed
-- **Deadeye (X)** slows time to ~10%, letting the player place the dotted line precisely before committing
+- **Deadeye (X)** slows time to ~10%, giving extra time to line up shots
 
 ---
 
 ## Core Mechanic 2: The Slide
 
 - **Space** on the ground triggers a horizontal slide in current facing direction
-- Aim angle **locks in at slide start** — dotted line angle at that moment is what fires
-- Player can tap **F** during the slide to fire along the locked angle
+- Player can tap **F** during the slide to fire — shots go upward at an angle
 - **~1s of I-frames** — projectiles and contact damage pass through completely
 - **1.5s cooldown** after slide completes — HUD indicator shows when ready
 - Cannot slide while airborne
 - Cannot slide while reloading
-- Dotted line remains visible during slide showing locked trajectory
 
 **The skill loop:**
 1. Read the room — spot threats, note the Lurker in the back
-2. Set aim angle with ↑/↓, watch the dotted line settle on target
-3. Commit to the slide — I-frames carry through incoming fire
-4. Fire mid-slide along the locked angle
-5. Come out the other side with enemies behind you
+2. Commit to the slide — I-frames carry through incoming fire
+3. Fire mid-slide — angled shots hit elevated targets while dodging ground threats
+4. Come out the other side with enemies behind you
 
 ---
 
@@ -73,8 +71,7 @@ Uses `stat(28)` raw keyboard scanning for WASD + F + Space, combined with PICO-8
 ## Deadeye
 
 - Hold **X** to enter Deadeye — time slows to ~10%
-- Dotted line guideline remains visible and responds to ↑/↓ during Deadeye
-- Player still taps F to fire — Deadeye gives time to place the shot
+- Player still taps F to fire — Deadeye gives extra time to position and shoot
 - Drains a meter while held — refills passively over time
 - Deadeye Flask consumable refills it instantly
 - **In the boss fight, The Warden uses its own Deadeye** — screen desaturates with a dramatic flash, Warden freezes briefly, then fires a precise high-damage burst. Player must slide through it. This is the surprise payoff for learning the system all run.
@@ -191,7 +188,7 @@ Top-left:     ❤❤❤❤❤  HP hearts
 Top-center:   [========]  Deadeye meter (pulses when full)
 Top-right:    gun icon + ammo  |  3 item slots
 Bottom-right: [●] slide cooldown indicator (fills back over 1.5s)
-Always-on:    dotted line from player to crosshair
+Always-on:    (none — shots are fixed direction, no guideline)
 ```
 
 ---
@@ -239,7 +236,7 @@ Music: 2 tracks — tense ambient loop for rooms, driving percussion loop for bo
 -- === PLAYER ===
 -- === SLIDE ===
 -- === DEADEYE ===
--- === SHOT GUIDELINE ===
+-- === SHOOTING ===
 -- === ENEMIES ===
 --     grunt
 --     lurker

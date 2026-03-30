@@ -1,24 +1,46 @@
 -- === ui / hud ===
 function draw_hud()
- -- minimal for session 1
+ -- slide cooldown indicator (bottom-right)
+ draw_slide_cd()
+end
+
+function draw_slide_cd()
+ local cx,cy,r=118,118,4
+ -- background circle
+ circ(cx,cy,r,1)
+ if p.slide_cd>0 then
+  -- fill based on remaining cooldown
+  local pct=p.slide_cd/slide_cd_max
+  local fill=flr(pct*r)
+  for dy=-r,r do
+   if dy>=-r+fill then
+    local dx=flr(sqrt(r*r-dy*dy))
+    line(cx-dx,cy+dy,cx+dx,cy+dy,8)
+   end
+  end
+ else
+  -- ready indicator
+  circfill(cx,cy,r,11)
+ end
+ circ(cx,cy,r,7)
 end
 
 function draw_title()
  cls(0)
  print("dead orbit",44,30,7)
  print("a space cowboy tale",26,42,6)
- print("press f to start",32,80,10)
+ print("press x to start",32,80,10)
 end
 
 function draw_gameover()
  cls(0)
  print("game over",46,45,8)
- print("press f to retry",32,70,6)
+ print("press x to retry",32,70,6)
 end
 
 function draw_pause()
  rectfill(24,35,103,85,0)
  rect(24,35,103,85,7)
  print("paused",52,50,7)
- print("f to resume",42,65,6)
+ print("x to resume",42,65,6)
 end

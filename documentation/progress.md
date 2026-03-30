@@ -12,22 +12,19 @@
 - [x] Blank room renders with `rectfill()` floor and walls
 
 ## Session 2 — Core Combat Loop
-- [ ] Shot guideline: dotted line renders from player to crosshair
-- [ ] Aim angle: ↑/↓ arrow input adjusts dotted line in real time
-- [ ] Shooting: semi-auto F key, bullet spawns, travels, despawns
-- [ ] Bullet collision with walls
-- [ ] Bullet placeholder sprite
-- [ ] Slide: Space triggers horizontal slide, ground only
-- [ ] Slide: aim locks at slide start, dotted line shows locked angle
-- [ ] Slide: I-frames (~1s), cooldown (1.5s)
-- [ ] Slide: player can fire mid-slide
-- [ ] Slide cooldown HUD indicator
+- [x] Shooting: semi-auto X key, bullet spawns in front of player, travels straight, despawns on wall/off-screen
+- [x] Bullet collision with walls
+- [x] Shooting while jumping and crouching (straight horizontal)
+- [x] Sprite note: bullet = sprite index 5 (`blt_spr`), currently drawn as 4x2 yellow rect placeholder. Slide uses crouch sprite (index 4) — draw a slide variant there or add a dedicated sprite later
+- [x] Slide: Space triggers horizontal slide, ground only
+- [x] Slide: I-frames (~1s), cooldown (1.5s)
+- [x] Slide: player can fire mid-slide (shots go up at an angle)
+- [x] Slide cooldown HUD indicator
 
 ## Session 3 — Deadeye
 - [ ] Deadeye: X key hold slows time to ~10%
 - [ ] Deadeye: meter drains while held, refills passively
-- [ ] Deadeye: dotted line active and responsive during slow-mo
-- [ ] Deadeye: player can still fire with F during slow-mo
+- [ ] Deadeye: player can still move, shoot, and slide during slow-mo
 - [ ] Deadeye meter HUD element
 
 ## Session 4 — Room System
@@ -65,7 +62,7 @@
 - [ ] Ammo count + gun icon (top-right)
 - [ ] Item slots (top-right)
 - [ ] Slide cooldown indicator (bottom-right)
-- [ ] Dotted line does not visually conflict with HUD
+- [ ] No visual overlap between HUD elements
 
 ## Session 8 — Boss
 - [ ] Warden spawns in boss room

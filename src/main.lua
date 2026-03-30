@@ -10,7 +10,7 @@ function _update()
  read_input()
 
  if state=="title" then
-  if key("f") then
+  if key("x") then
    init_player()
    set_state("game")
   end
@@ -22,11 +22,11 @@ function _update()
   update_player()
   update_particles()
  elseif state=="pause" then
-  if key("f") then
+  if key("x") then
    set_state("game")
   end
  elseif state=="gameover" then
-  if key("f") then
+  if key("x") then
    set_state("title")
   end
  end
@@ -39,12 +39,14 @@ function _draw()
   cls(0)
   draw_room()
   draw_player()
+  draw_bullets()
   draw_particles()
   draw_hud()
  elseif state=="pause" then
   cls(0)
   draw_room()
   draw_player()
+  draw_bullets()
   draw_particles()
   draw_hud()
   draw_pause()
