@@ -3,7 +3,19 @@ function _init()
  poke(0x5f2d,1)
  poke(0x5f30,1)
  init_player()
+ init_enemies()
  state="title"
+end
+
+function init_enemies()
+ enemies={}
+ e_projs={}
+ -- test spawns: one of each enemy
+ spawn_grunt(90,rm_f-16)
+ spawn_lurker(80,rm_t) -- ceiling lurker
+ spawn_crawler(100,rm_f-8)
+ spawn_crawler(105,rm_f-8) -- pair
+ spawn_turret(95,rm_f-32)
 end
 
 function _update()
@@ -12,6 +24,7 @@ function _update()
  if state=="title" then
   if key("x") then
    init_player()
+   init_enemies()
    set_state("game")
   end
  elseif state=="game" then
@@ -20,10 +33,14 @@ function _update()
    return
   end
   update_player()
+  update_enemies()
   update_particles()
  elseif state=="pause" then
   if key("x") then
    set_state("game")
+  end
+  if key("d") then
+   god_mode=not god_mode
   end
  elseif state=="gameover" then
   if key("x") then
@@ -38,6 +55,8 @@ function _draw()
  elseif state=="game" then
   cls(0)
   draw_room()
+  draw_enemies()
+  draw_e_projs()
   draw_player()
   draw_bullets()
   draw_particles()
@@ -45,6 +64,8 @@ function _draw()
  elseif state=="pause" then
   cls(0)
   draw_room()
+  draw_enemies()
+  draw_e_projs()
   draw_player()
   draw_bullets()
   draw_particles()

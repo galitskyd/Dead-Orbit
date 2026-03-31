@@ -37,15 +37,15 @@
 - [ ] Placeholder tiles replace `rectfill()` blocks
 
 ## Session 5 — Enemies
-- [ ] Drifter Grunt: movement, straight projectile, 3 HP, ammo drop
-- [ ] Grunt placeholder sprite
-- [ ] The Lurker: wall/ceiling clinging, arc spit, charge telegraph, 2 HP
-- [ ] Lurker placeholder sprite
-- [ ] Void Crawler: fast rush, pack spawning, 2 HP
-- [ ] Crawler placeholder sprite
-- [ ] Station Turret: LOS detection, burst fire, 5 HP, destructible
-- [ ] Turret placeholder sprite
-- [ ] All enemies: slide I-frame interaction verified
+- [x] Drifter Grunt: movement, straight projectile, 3 HP, ammo drop
+- [x] Grunt placeholder sprite
+- [x] The Lurker: wall/ceiling clinging, arc spit, charge telegraph, 2 HP
+- [x] Lurker placeholder sprite
+- [x] Void Crawler: fast rush, pack spawning, 2 HP
+- [x] Crawler placeholder sprite
+- [x] Station Turret: LOS detection, burst fire, 5 HP, destructible
+- [x] Turret placeholder sprite
+- [x] All enemies: slide I-frame interaction verified
 
 ## Session 6 — Items & Inventory
 - [ ] Item pickup system

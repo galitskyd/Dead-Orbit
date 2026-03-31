@@ -42,6 +42,50 @@ function spawn_impact(x,y)
  end
 end
 
+function spawn_explosion(x,y)
+ -- bright core burst
+ for i=1,12 do
+  local a=rnd(1) -- random angle
+  local spd=0.5+rnd(2)
+  local l=10+flr(rnd(12))
+  add(particles,{
+   x=x,y=y,
+   vx=cos(a)*spd,
+   vy=sin(a)*spd,
+   life=l,maxlife=l,
+   c=10,
+   fade={10,9,8}
+  })
+ end
+ -- hot sparks that fly further
+ for i=1,6 do
+  local a=rnd(1)
+  local spd=1.5+rnd(2)
+  add(particles,{
+   x=x,y=y,
+   vx=cos(a)*spd,
+   vy=sin(a)*spd-0.5,
+   life=14+flr(rnd(8)),
+   c=10
+  })
+ end
+ -- lingering smoke puffs
+ for i=1,5 do
+  local l=18+flr(rnd(10))
+  add(particles,{
+   x=x+rnd(6)-3,
+   y=y+rnd(6)-3,
+   vx=rnd(0.4)-0.2,
+   vy=-0.3-rnd(0.3),
+   life=l,maxlife=l,
+   c=6,
+   fade={6,5,1}
+  })
+ end
+ -- sfx placeholder: crawler explosion
+ sfx(2)
+end
+
 function update_particles()
  for pt in all(particles) do
   pt.x+=pt.vx

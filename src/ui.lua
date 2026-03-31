@@ -39,8 +39,16 @@ function draw_gameover()
 end
 
 function draw_pause()
- rectfill(24,35,103,85,0)
- rect(24,35,103,85,7)
- print("paused",52,50,7)
- print("x to resume",42,65,6)
+ rectfill(24,35,103,92,0)
+ rect(24,35,103,92,7)
+ print("paused",52,42,7)
+ print("x to resume",42,55,6)
+ local dc=11
+ local dt="on"
+ if not god_mode then
+  dc=8
+  dt="off"
+ end
+ print("d: god mode "..dt,32,70,dc)
+ print("(no damage)",40,80,5)
 end

@@ -19,6 +19,8 @@ function init_player()
  p.gun_cd=0
  p.reloading=false
  p.reload_t=0
+ p.hp=p_hp_max
+ p.hurt_t=0
 end
 
 function update_player()
@@ -63,6 +65,9 @@ function update_player()
    moving=false
   end
  end
+
+ -- hurt invuln tick
+ if p.hurt_t>0 then p.hurt_t-=1 end
 
  -- gun cooldown
  if p.gun_cd>0 then p.gun_cd-=1 end
@@ -143,9 +148,19 @@ function update_player()
  end
 end
 
+function hurt_player()
+ if god_mode then return end
+ if p.iframe_t>0 or p.hurt_t>0 then return end
+ p.hp-=1
+ p.hurt_t=p_hurt_cd
+ if p.hp<=0 then
+  set_state("gameover")
+ end
+end
+
 function draw_player()
- -- flash during i-frames
- if p.iframe_t>0 and p.anim_t%4<2 then
+ -- flash during i-frames or hurt invuln
+ if (p.iframe_t>0 or p.hurt_t>0) and p.anim_t%4<2 then
   return
  end
  spr(p.spr,p.x,p.y,2,2,p.facing==-1)
