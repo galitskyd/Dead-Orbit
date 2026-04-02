@@ -3,6 +3,8 @@ function _init()
  poke(0x5f2d,1)
  poke(0x5f30,1)
  init_camera()
+ init_platforms()
+ init_pits()
  init_player()
  init_enemies()
  state="title"
@@ -11,17 +13,17 @@ end
 function init_enemies()
  enemies={}
  e_projs={}
- -- test spawns spread across the level
+ -- ground-level enemies (near spawn)
  spawn_grunt(90,rm_f-16)
  spawn_lurker(80,rm_t)
  spawn_crawler(100,rm_f-8)
  spawn_crawler(105,rm_f-8)
- spawn_turret(95,rm_f-32)
- -- mid-level enemies
- spawn_grunt(200,rm_f-16)
- spawn_crawler(220,rm_f-8)
- spawn_turret(250,rm_f-32)
- -- far-level enemies
+ -- on stairs (top step at x=188,y=64)
+ spawn_turret(190,64-16)
+ -- on floating platforms
+ spawn_grunt(250,80-16)    -- plat at y=80
+ spawn_crawler(310,60-8)   -- plat at y=60
+ -- far-level ground enemies
  spawn_grunt(320,rm_f-16)
  spawn_lurker(300,rm_t)
  spawn_crawler(340,rm_f-8)
@@ -33,6 +35,8 @@ function _update()
  if state=="title" then
   if key("x") then
    init_camera()
+   init_platforms()
+   init_pits()
    init_player()
    init_enemies()
    set_state("game")

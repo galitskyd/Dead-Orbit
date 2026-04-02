@@ -102,21 +102,32 @@ function update_player()
   p.gun_cd=gun_cd_max
  end
 
- -- gravity
- if not p.grounded then
-  p.vy+=grav
-  if p.vy>max_vy then p.vy=max_vy end
- end
+ -- gravity (always apply, floor/plat collision cancels)
+ p.vy+=grav
+ if p.vy>max_vy then p.vy=max_vy end
 
  -- apply velocity
  p.x+=p.vx
  p.y+=p.vy
+ p.grounded=false
 
- -- floor collision
- if p.y+p.h>rm_f then
+ -- platform collision (one-way from above)
+ if p.vy>=0 and plat_collide(p) then
+  p.grounded=true
+ end
+
+ -- floor collision (skip if over pit)
+ if p.y+p.h>rm_f
+ and not over_pit(p.x,p.w) then
   p.y=rm_f-p.h
   p.vy=0
   p.grounded=true
+ end
+
+ -- pit death
+ if p.y>lvl_h+16 then
+  p.hp=0
+  set_state("gameover")
  end
 
  -- ceiling collision

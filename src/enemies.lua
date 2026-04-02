@@ -28,7 +28,10 @@ function spawn_grunt(x,y)
   spd=grunt_spd,
   fire_t=grunt_fire_cd,
   facing=-1,
-  flash=0
+  flash=0,
+  vy=0,
+  grounded=false,
+  jump_cd=0
  })
 end
 
@@ -55,7 +58,9 @@ function spawn_crawler(x,y)
   tumble=0,
   dying=false,
   die_t=0,
-  anim_t=0
+  anim_t=0,
+  vy=0,
+  grounded=false
  })
 end
 
@@ -67,7 +72,9 @@ function spawn_turret(x,y)
   burst_left=0,
   burst_t=0,
   cooldown=30,
-  flash=0
+  flash=0,
+  vy=0,
+  grounded=false
  })
 end
 
@@ -94,6 +101,46 @@ function update_enemies()
  check_contact_player()
 end
 
+-- check if enemy's leading foot is over a pit
+-- used to stop enemies from walking in
+function enemy_at_pit(e,dir)
+ -- only care when on the floor
+ if e.y+e.h<rm_f-2 then return false end
+ -- check leading edge + a few px ahead
+ local cx=dir==1 and e.x+e.w+2 or e.x-2
+ return is_pit(cx)
+end
+
+-- shared gravity+collision for walking enemies
+function enemy_physics(e)
+ e.vy+=grav
+ if e.vy>max_vy then e.vy=max_vy end
+ e.y+=e.vy
+ e.grounded=false
+
+ if e.vy>=0 and plat_collide(e) then
+  e.grounded=true
+ end
+
+ -- floor collision (skip over pits)
+ if e.y+e.h>rm_f
+ and not over_pit(e.x,e.w) then
+  e.y=rm_f-e.h
+  e.vy=0
+  e.grounded=true
+ end
+
+ -- fell into pit: remove
+ if e.y>lvl_h+16 then
+  del(enemies,e)
+  return
+ end
+
+ -- wall clamp
+ if e.x<rm_l then e.x=rm_l end
+ if e.x+e.w>rm_r then e.x=rm_r-e.w end
+end
+
 -- === grunt ===
 
 function update_grunt(e)
@@ -101,19 +148,23 @@ function update_grunt(e)
  if p.x<e.x then e.facing=-1
  else e.facing=1 end
 
- -- walk toward player
+ -- walk toward player (avoid pits)
  local dx=p.x-e.x
- if abs(dx)>24 then
+ if abs(dx)>24
+ and not enemy_at_pit(e,e.facing) then
   e.x+=e.spd*e.facing
  end
 
- -- floor clamp
- if e.y+e.h>rm_f then
-  e.y=rm_f-e.h
+ -- jump toward player if above
+ if e.jump_cd>0 then e.jump_cd-=1 end
+ if e.grounded and e.jump_cd<=0
+ and p.y<e.y-20 and abs(dx)<80 then
+  e.vy=jump_spd*0.9
+  e.grounded=false
+  e.jump_cd=60
  end
- -- wall clamp
- if e.x<rm_l then e.x=rm_l end
- if e.x+e.w>rm_r then e.x=rm_r-e.w end
+
+ enemy_physics(e)
 
  -- fire
  e.fire_t-=1
@@ -204,28 +255,23 @@ function update_crawler(e)
   e.jitter_t=0
  end
 
- e.x+=e.spd
+ -- pit avoidance: reverse at edge
+ local move_dir=e.spd>0 and 1 or -1
+ if enemy_at_pit(e,move_dir) then
+  e.spd=-e.spd*0.5
+ else
+  e.x+=e.spd
+ end
 
- -- floor clamp
- if e.y+e.h>rm_f then
-  e.y=rm_f-e.h
- end
- -- wall bounce
- if e.x<rm_l then
-  e.x=rm_l
-  e.spd=abs(e.spd)
-  e.tumble=10
- end
- if e.x+e.w>rm_r then
-  e.x=rm_r-e.w
-  e.spd=-abs(e.spd)
-  e.tumble=10
- end
+ enemy_physics(e)
 end
 
 -- === turret ===
 
 function update_turret(e)
+ -- gravity + platform support
+ enemy_physics(e)
+
  -- stationary, los check
  e.cooldown-=1
  if e.cooldown>0 then return end

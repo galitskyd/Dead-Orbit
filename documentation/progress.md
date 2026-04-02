@@ -34,6 +34,18 @@
 - [x] Room drawing uses world-space bounds
 - [x] HUD draws in screen-space (unaffected by camera)
 - [x] Enemies spread across full level
+- [x] One-way platforms (jump through from below, land on top)
+- [x] Staircase layout (3 ascending steps near x=140-188)
+- [x] Floating platforms (x=245 and x=295)
+- [x] Enemy gravity + platform collision (shared enemy_physics())
+- [x] Grunts jump toward player when player is above them
+- [x] Turret, grunt, crawler spawned on elevated platforms
+- [x] Pits — 2 gaps in the floor (x=115 and x=268, 24px wide)
+- [x] Player falls through pits, dies below level
+- [x] Grunt pit avoidance (stops at edge, won't walk in)
+- [x] Crawler pit avoidance (reverses at edge)
+- [x] Enemies that fall in pits are removed
+- [x] Pit rendering with edge highlights
 - [ ] Tilemap rendering
 - [ ] Platform collision
 - [ ] Door lock / unlock logic (clears when enemies gone)
