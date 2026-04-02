@@ -3,8 +3,7 @@ function _init()
  poke(0x5f2d,1)
  poke(0x5f30,1)
  init_camera()
- init_platforms()
- init_pits()
+ generate_level()
  init_player()
  init_enemies()
  state="title"
@@ -13,20 +12,59 @@ end
 function init_enemies()
  enemies={}
  e_projs={}
- -- ground-level enemies (near spawn)
- spawn_grunt(90,rm_f-16)
- spawn_lurker(80,rm_t)
- spawn_crawler(100,rm_f-8)
- spawn_crawler(105,rm_f-8)
- -- on stairs (top step at x=188,y=64)
- spawn_turret(190,64-16)
- -- on floating platforms
- spawn_grunt(250,80-16)    -- plat at y=80
- spawn_crawler(310,60-8)   -- plat at y=60
- -- far-level ground enemies
- spawn_grunt(320,rm_f-16)
- spawn_lurker(300,rm_t)
- spawn_crawler(340,rm_f-8)
+
+ -- ground grunts (3-4)
+ for i=1,3+flr(rnd(2)) do
+  local x=rand_ground_x(16)
+  if x then spawn_grunt(x,rm_f-16) end
+ end
+
+ -- ground crawlers in pairs (2-4)
+ for i=1,2+flr(rnd(3)) do
+  local x=rand_ground_x(8)
+  if x then
+   spawn_crawler(x,rm_f-8)
+   -- pair: second crawler nearby
+   if not over_pit(x+12,8) then
+    spawn_crawler(x+12,rm_f-8)
+   end
+  end
+ end
+
+ -- ceiling lurkers (1-2)
+ for i=1,1+flr(rnd(2)) do
+  local x=safe_r+flr(rnd(rm_r-safe_r-20))
+  spawn_lurker(x,rm_t)
+ end
+
+ -- enemies on platforms (~40% chance each)
+ for pl in all(platforms) do
+  if rnd(1)<0.4 then
+   local r=rnd(1)
+   local px=pl.x+flr(rnd(max(pl.w-16,1)))
+   if r<0.35 then
+    spawn_turret(px,pl.y-16)
+   elseif r<0.7 then
+    spawn_grunt(px,pl.y-16)
+   else
+    spawn_crawler(
+     pl.x+flr(rnd(max(pl.w-8,1))),
+     pl.y-8)
+   end
+  end
+ end
+end
+
+-- find a random valid ground x
+-- (outside safe zone, not over pit)
+function rand_ground_x(w)
+ for try=1,15 do
+  local x=safe_r+flr(rnd(rm_r-safe_r-w))
+  if not over_pit(x,w) then
+   return x
+  end
+ end
+ return nil
 end
 
 function _update()
@@ -35,8 +73,7 @@ function _update()
  if state=="title" then
   if key("x") then
    init_camera()
-   init_platforms()
-   init_pits()
+   generate_level()
    init_player()
    init_enemies()
    set_state("game")

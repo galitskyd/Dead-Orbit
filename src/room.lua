@@ -2,30 +2,94 @@
 platforms={}
 pits={}
 
-function init_platforms()
+-- safe zone: no hazards or enemies
+safe_r=rm_l+80
+
+function generate_level()
  platforms={}
- -- stairs (ascending right)
- add_plat(140,96,32,4)
- add_plat(164,80,32,4)
- add_plat(188,64,32,4)
- -- floating platforms
- add_plat(245,80,48,4)
- add_plat(295,60,48,4)
+ pits={}
+ gen_pits()
+ gen_platforms()
 end
 
-function init_pits()
- pits={}
- -- pit 1: between start area and stairs
- add(pits,{x=115,w=24})
- -- pit 2: between floating platforms
- add(pits,{x=268,w=24})
+-- === pit generation ===
+
+function gen_pits()
+ local count=1+flr(rnd(2)) -- 1-2 pits
+ for i=1,count do
+  for try=1,10 do
+   local px=safe_r+20+flr(rnd(rm_r-safe_r-60))
+   local pw=20+flr(rnd(10)) -- 20-29px
+   if not pit_conflicts(px,pw) then
+    add(pits,{x=px,w=pw})
+    break
+   end
+  end
+ end
+end
+
+function pit_conflicts(px,pw)
+ for pt in all(pits) do
+  -- min 60px between pits
+  if px<pt.x+pt.w+60
+  and px+pw>pt.x-60 then
+   return true
+  end
+ end
+ return false
+end
+
+-- === platform generation ===
+
+function gen_platforms()
+ local x=safe_r+10+flr(rnd(20))
+ while x<rm_r-50 do
+  local r=rnd(1)
+  if r<0.3 then
+   -- staircase: 2-3 ascending steps
+   local steps=2+flr(rnd(2))
+   local sy=rm_f-16-flr(rnd(16))
+   for s=0,steps-1 do
+    local sx=x+s*24
+    local step_y=sy-s*16
+    if step_y>rm_t+20
+    and sx+32<rm_r
+    and not span_hits_pit(sx,32) then
+     add_plat(sx,step_y,32,4)
+    end
+   end
+   x+=steps*24+20+flr(rnd(20))
+  elseif r<0.7 then
+   -- floating platform
+   local pw=32+flr(rnd(24))
+   local py=rm_t+24+flr(rnd(rm_f-rm_t-48))
+   if x+pw<rm_r
+   and not span_hits_pit(x,pw) then
+    add_plat(x,py,pw,4)
+   end
+   x+=pw+20+flr(rnd(30))
+  else
+   -- empty space, advance
+   x+=30+flr(rnd(40))
+  end
+ end
+end
+
+function span_hits_pit(x,w)
+ for pt in all(pits) do
+  if x<pt.x+pt.w+4 and x+w>pt.x-4 then
+   return true
+  end
+ end
+ return false
 end
 
 function add_plat(x,y,w,h)
  add(platforms,{x=x,y=y,w=w,h=h})
 end
 
--- check if a single x point is over a pit
+-- === pit helpers ===
+
 function is_pit(x)
  for pt in all(pits) do
   if x>=pt.x and x<pt.x+pt.w then
@@ -35,14 +99,12 @@ function is_pit(x)
  return false
 end
 
--- check if an object's center is over a pit
 function over_pit(x,w)
  return is_pit(x+w/2)
 end
 
--- one-way platform collision
--- obj needs: x,y,w,h,vy
--- returns true if landed
+-- === platform collision ===
+
 function plat_collide(obj)
  if obj.vy<0 then return false end
  local feet=obj.y+obj.h
@@ -59,38 +121,31 @@ function plat_collide(obj)
  return false
 end
 
+-- === drawing ===
+
 function draw_room()
- -- floor (full level width)
+ -- floor
  rectfill(0,rm_f,lvl_w-1,lvl_h-1,5)
- -- floor highlight
  line(rm_l,rm_f,rm_r-1,rm_f,6)
  -- cut out pits
  for pt in all(pits) do
   rectfill(pt.x,rm_f,
    pt.x+pt.w-1,lvl_h-1,0)
-  -- edge highlights (walls of the pit)
   line(pt.x-1,rm_f,pt.x-1,lvl_h-1,6)
   line(pt.x+pt.w,rm_f,pt.x+pt.w,lvl_h-1,6)
  end
  -- ceiling
  rectfill(0,0,lvl_w-1,rm_t-1,5)
- -- left wall
+ -- walls
  rectfill(0,0,rm_l-1,lvl_h-1,5)
- -- right wall
  rectfill(rm_r,0,lvl_w-1,lvl_h-1,5)
- -- edge highlights (walls/ceiling)
  line(rm_l,rm_t,rm_r-1,rm_t,6)
  line(rm_l,rm_t,rm_l,rm_f,6)
  line(rm_r-1,rm_t,rm_r-1,rm_f,6)
  -- platforms
- draw_platforms()
-end
-
-function draw_platforms()
  for pl in all(platforms) do
   rectfill(pl.x,pl.y,
    pl.x+pl.w-1,pl.y+pl.h-1,5)
-  -- top edge highlight
   line(pl.x,pl.y,pl.x+pl.w-1,pl.y,6)
  end
 end
