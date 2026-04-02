@@ -2,6 +2,7 @@
 function _init()
  poke(0x5f2d,1)
  poke(0x5f30,1)
+ init_camera()
  init_player()
  init_enemies()
  state="title"
@@ -10,12 +11,20 @@ end
 function init_enemies()
  enemies={}
  e_projs={}
- -- test spawns: one of each enemy
+ -- test spawns spread across the level
  spawn_grunt(90,rm_f-16)
- spawn_lurker(80,rm_t) -- ceiling lurker
+ spawn_lurker(80,rm_t)
  spawn_crawler(100,rm_f-8)
- spawn_crawler(105,rm_f-8) -- pair
+ spawn_crawler(105,rm_f-8)
  spawn_turret(95,rm_f-32)
+ -- mid-level enemies
+ spawn_grunt(200,rm_f-16)
+ spawn_crawler(220,rm_f-8)
+ spawn_turret(250,rm_f-32)
+ -- far-level enemies
+ spawn_grunt(320,rm_f-16)
+ spawn_lurker(300,rm_t)
+ spawn_crawler(340,rm_f-8)
 end
 
 function _update()
@@ -23,6 +32,7 @@ function _update()
 
  if state=="title" then
   if key("x") then
+   init_camera()
    init_player()
    init_enemies()
    set_state("game")
@@ -35,6 +45,7 @@ function _update()
   update_player()
   update_enemies()
   update_particles()
+  update_camera()
  elseif state=="pause" then
   if key("x") then
    set_state("game")
@@ -54,21 +65,25 @@ function _draw()
   draw_title()
  elseif state=="game" then
   cls(0)
+  camera(cam_x,0)
   draw_room()
   draw_enemies()
   draw_e_projs()
   draw_player()
   draw_bullets()
   draw_particles()
+  camera(0,0)
   draw_hud()
  elseif state=="pause" then
   cls(0)
+  camera(cam_x,0)
   draw_room()
   draw_enemies()
   draw_e_projs()
   draw_player()
   draw_bullets()
   draw_particles()
+  camera(0,0)
   draw_hud()
   draw_pause()
  elseif state=="gameover" then

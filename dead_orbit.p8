@@ -5,6 +5,7 @@ __lua__
 #include src/particles.lua
 #include src/state.lua
 #include src/input.lua
+#include src/camera.lua
 #include src/slide.lua
 #include src/bullets.lua
 #include src/player.lua

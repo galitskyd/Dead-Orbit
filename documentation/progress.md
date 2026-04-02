@@ -28,6 +28,12 @@
 - [ ] Deadeye meter HUD element
 
 ## Session 4 — Room System
+- [x] World coordinate system (entities use world-space x,y)
+- [x] Camera system with 80% deadzone scrolling
+- [x] Level expanded to 3x screen width (384px)
+- [x] Room drawing uses world-space bounds
+- [x] HUD draws in screen-space (unaffected by camera)
+- [x] Enemies spread across full level
 - [ ] Tilemap rendering
 - [ ] Platform collision
 - [ ] Door lock / unlock logic (clears when enemies gone)

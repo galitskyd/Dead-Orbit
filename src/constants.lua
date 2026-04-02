@@ -7,11 +7,17 @@ max_vy=4
 jump_spd=-4
 move_spd=1.5
 
--- room bounds (rectfill room)
+-- level bounds (world coords)
+-- 3x wider than original single screen
+lvl_w=384 -- 3 * 128
+lvl_h=128
 rm_l=8
-rm_r=120
+rm_r=lvl_w-8  -- 376
 rm_t=8
 rm_f=112
+
+-- camera
+cam_dz=0.80 -- deadzone: inner 80% of screen
 
 -- bullets / revolver
 blt_spd=3
