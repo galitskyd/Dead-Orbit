@@ -1,5 +1,7 @@
 -- === ui / hud ===
 function draw_hud()
+ -- floor depth (top-left)
+ print("floor "..(lvl_depth+1),2,2,6)
  -- slide cooldown indicator (bottom-right)
  draw_slide_cd()
 end
@@ -34,7 +36,8 @@ end
 
 function draw_gameover()
  cls(0)
- print("game over",46,45,8)
+ print("game over",46,38,8)
+ print("reached floor "..(lvl_depth+1),34,50,6)
  print("press x to retry",32,70,6)
 end
 

@@ -41,8 +41,14 @@
 - [x] Enemies that fall in pits are removed
 - [x] Procedural level generation (pits, platforms, staircases)
 - [x] Procedural enemy placement (ground, platforms, ceiling)
-- [x] Safe spawn zone (first 80px clear of hazards/enemies)
-- [x] New layout every restart (press X from title/gameover)
+- [x] Safe spawn zone (spawn side clear of hazards/enemies)
+- [x] Looping descent: goal pit on far side, jump in to advance
+- [x] Direction flips each floor (left→right, right→left)
+- [x] Enemy count scales with depth (grunts 2-6, crawlers 1-4 pairs, lurkers 1-3)
+- [x] Player keeps HP/ammo between floors, falls in from ceiling
+- [x] Goal pit has green edges + down arrow indicator
+- [x] Hazard pits in the middle still kill
+- [x] Floor counter on HUD and game over screen
 - [ ] Tilemap rendering
 - [ ] Platform collision
 - [ ] Door lock / unlock logic (clears when enemies gone)

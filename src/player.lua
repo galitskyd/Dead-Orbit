@@ -2,7 +2,14 @@
 p={}
 
 function init_player()
- p.x=56
+ -- spawn on correct side based on direction
+ if lvl_dir==1 then
+  p.x=rm_l+8
+  p.facing=1
+ else
+  p.x=rm_r-24
+  p.facing=-1
+ end
  p.y=rm_f-16
  p.w=16
  p.h=16
@@ -10,7 +17,6 @@ function init_player()
  p.vy=0
  p.grounded=true
  p.crouching=false
- p.facing=1
  p.spr=0
  p.anim_t=0
  init_slide()
@@ -21,6 +27,28 @@ function init_player()
  p.reload_t=0
  p.hp=p_hp_max
  p.hurt_t=0
+end
+
+-- called when descending to next floor
+function drop_player()
+ if lvl_dir==1 then
+  p.x=rm_l+8
+  p.facing=1
+ else
+  p.x=rm_r-24
+  p.facing=-1
+ end
+ p.y=rm_t+4
+ p.vy=2
+ p.vx=0
+ p.grounded=false
+ p.crouching=false
+ p.sliding=false
+ p.slide_t=0
+ p.iframe_t=0
+ p.slide_cd=0
+ bullets={}
+ -- keep current hp and ammo
 end
 
 function update_player()
@@ -124,10 +152,15 @@ function update_player()
   p.grounded=true
  end
 
- -- pit death
+ -- fell below level
  if p.y>lvl_h+16 then
-  p.hp=0
-  set_state("gameover")
+  if over_goal_pit(p.x,p.w) then
+   advance_level()
+   return
+  else
+   p.hp=0
+   set_state("gameover")
+  end
  end
 
  -- ceiling collision

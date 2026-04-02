@@ -1,25 +1,51 @@
 -- === room / map ===
 platforms={}
 pits={}
-
--- safe zone: no hazards or enemies
-safe_r=rm_l+80
+goal_pit=nil
 
 function generate_level()
  platforms={}
  pits={}
- gen_pits()
+
+ -- goal pit on far side from spawn
+ if lvl_dir==1 then
+  goal_pit={x=rm_r-34,w=30,goal=true}
+ else
+  goal_pit={x=rm_l+4,w=30,goal=true}
+ end
+ add(pits,goal_pit)
+
+ gen_hazard_pits()
  gen_platforms()
 end
 
--- === pit generation ===
+-- safe zone boundaries (spawn side)
+function safe_zone()
+ if lvl_dir==1 then
+  return rm_l,rm_l+80
+ else
+  return rm_r-80,rm_r
+ end
+end
 
-function gen_pits()
- local count=1+flr(rnd(2)) -- 1-2 pits
+-- middle zone (between safe zone and goal pit)
+function mid_zone()
+ if lvl_dir==1 then
+  return rm_l+90,rm_r-50
+ else
+  return rm_l+50,rm_r-90
+ end
+end
+
+-- === hazard pit generation ===
+
+function gen_hazard_pits()
+ local ml,mr=mid_zone()
+ local count=flr(rnd(3)) -- 0-2 hazard pits
  for i=1,count do
   for try=1,10 do
-   local px=safe_r+20+flr(rnd(rm_r-safe_r-60))
-   local pw=20+flr(rnd(10)) -- 20-29px
+   local px=ml+flr(rnd(mr-ml-30))
+   local pw=20+flr(rnd(10))
    if not pit_conflicts(px,pw) then
     add(pits,{x=px,w=pw})
     break
@@ -30,7 +56,6 @@ end
 
 function pit_conflicts(px,pw)
  for pt in all(pits) do
-  -- min 60px between pits
   if px<pt.x+pt.w+60
   and px+pw>pt.x-60 then
    return true
@@ -42,11 +67,12 @@ end
 -- === platform generation ===
 
 function gen_platforms()
- local x=safe_r+10+flr(rnd(20))
- while x<rm_r-50 do
+ local ml,mr=mid_zone()
+ local x=ml+flr(rnd(20))
+ while x<mr-30 do
   local r=rnd(1)
   if r<0.3 then
-   -- staircase: 2-3 ascending steps
+   -- staircase
    local steps=2+flr(rnd(2))
    local sy=rm_f-16-flr(rnd(16))
    for s=0,steps-1 do
@@ -69,7 +95,6 @@ function gen_platforms()
    end
    x+=pw+20+flr(rnd(30))
   else
-   -- empty space, advance
    x+=30+flr(rnd(40))
   end
  end
@@ -103,6 +128,13 @@ function over_pit(x,w)
  return is_pit(x+w/2)
 end
 
+-- check if center x is over the goal pit
+function over_goal_pit(x,w)
+ local cx=x+w/2
+ return cx>=goal_pit.x
+    and cx<goal_pit.x+goal_pit.w
+end
+
 -- === platform collision ===
 
 function plat_collide(obj)
@@ -131,8 +163,18 @@ function draw_room()
  for pt in all(pits) do
   rectfill(pt.x,rm_f,
    pt.x+pt.w-1,lvl_h-1,0)
-  line(pt.x-1,rm_f,pt.x-1,lvl_h-1,6)
-  line(pt.x+pt.w,rm_f,pt.x+pt.w,lvl_h-1,6)
+  -- goal pit: green edges, hazard: normal
+  local c=pt.goal and 11 or 6
+  line(pt.x-1,rm_f,pt.x-1,lvl_h-1,c)
+  line(pt.x+pt.w,rm_f,pt.x+pt.w,lvl_h-1,c)
+  -- goal pit: arrow indicator
+  if pt.goal then
+   local ax=pt.x+pt.w/2
+   -- down arrow
+   line(ax,rm_f+3,ax,rm_f+10,11)
+   line(ax-3,rm_f+7,ax,rm_f+10,11)
+   line(ax+3,rm_f+7,ax,rm_f+10,11)
+  end
  end
  -- ceiling
  rectfill(0,0,lvl_w-1,rm_t-1,5)
