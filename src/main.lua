@@ -7,9 +7,9 @@ function _init()
  poke(0x5f30,1)
  lvl_dir=1
  lvl_depth=0
- init_camera()
  generate_level()
  init_player()
+ init_camera()
  init_enemies()
  state="title"
 end
@@ -17,9 +17,9 @@ end
 function new_game()
  lvl_dir=1
  lvl_depth=0
- init_camera()
  generate_level()
  init_player()
+ init_camera()
  init_enemies()
  particles={}
 end
@@ -29,8 +29,8 @@ function advance_level()
  lvl_dir*=-1
  generate_level()
  drop_player()
- init_enemies()
  init_camera()
+ init_enemies()
  particles={}
 end
 

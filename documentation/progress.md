@@ -49,6 +49,9 @@
 - [x] Goal pit has green edges + down arrow indicator
 - [x] Hazard pits in the middle still kill
 - [x] Floor counter on HUD and game over screen
+- [x] Ceiling hole on spawn side — player drops in from above
+- [x] Player spawns above ceiling, falls through hole into level
+- [x] Red color theme on floor 10+ (walls, floor, platforms)
 - [ ] Tilemap rendering
 - [ ] Platform collision
 - [ ] Door lock / unlock logic (clears when enemies gone)

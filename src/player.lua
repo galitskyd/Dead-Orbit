@@ -31,14 +31,15 @@ end
 
 -- called when descending to next floor
 function drop_player()
+ -- spawn above ceiling hole
  if lvl_dir==1 then
-  p.x=rm_l+8
+  p.x=ceil_hole.x+7
   p.facing=1
  else
-  p.x=rm_r-24
+  p.x=ceil_hole.x+7
   p.facing=-1
  end
- p.y=rm_t+4
+ p.y=-16 -- above the screen/ceiling
  p.vy=2
  p.vx=0
  p.grounded=false
@@ -163,8 +164,9 @@ function update_player()
   end
  end
 
- -- ceiling collision
- if p.y<rm_t then
+ -- ceiling collision (skip if inside ceiling hole)
+ if p.y<rm_t
+ and not in_ceil_hole(p.x,p.w) then
   p.y=rm_t
   if p.vy<0 then p.vy=0 end
  end

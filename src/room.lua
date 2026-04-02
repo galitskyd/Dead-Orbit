@@ -2,10 +2,12 @@
 platforms={}
 pits={}
 goal_pit=nil
+ceil_hole=nil -- ceiling gap where player drops in
 
 function generate_level()
  platforms={}
  pits={}
+ ceil_hole=nil
 
  -- goal pit on far side from spawn
  if lvl_dir==1 then
@@ -14,6 +16,15 @@ function generate_level()
   goal_pit={x=rm_l+4,w=30,goal=true}
  end
  add(pits,goal_pit)
+
+ -- ceiling hole on spawn side (after first floor)
+ if lvl_depth>0 then
+  if lvl_dir==1 then
+   ceil_hole={x=rm_l+4,w=30}
+  else
+   ceil_hole={x=rm_r-34,w=30}
+  end
+ end
 
  gen_hazard_pits()
  gen_platforms()
@@ -35,6 +46,14 @@ function mid_zone()
  else
   return rm_l+50,rm_r-90
  end
+end
+
+-- level colors: red theme after floor 9
+function lvl_col()
+ if lvl_depth>=9 then
+  return 2,8 -- dark red fill, red highlight
+ end
+ return 5,6 -- dark purple fill, light purple highlight
 end
 
 -- === hazard pit generation ===
@@ -128,11 +147,18 @@ function over_pit(x,w)
  return is_pit(x+w/2)
 end
 
--- check if center x is over the goal pit
 function over_goal_pit(x,w)
  local cx=x+w/2
  return cx>=goal_pit.x
     and cx<goal_pit.x+goal_pit.w
+end
+
+-- check if x is inside ceiling hole
+function in_ceil_hole(x,w)
+ if not ceil_hole then return false end
+ local cx=x+w/2
+ return cx>=ceil_hole.x
+    and cx<ceil_hole.x+ceil_hole.w
 end
 
 -- === platform collision ===
@@ -156,38 +182,45 @@ end
 -- === drawing ===
 
 function draw_room()
+ local fc,hc=lvl_col()
  -- floor
- rectfill(0,rm_f,lvl_w-1,lvl_h-1,5)
- line(rm_l,rm_f,rm_r-1,rm_f,6)
- -- cut out pits
+ rectfill(0,rm_f,lvl_w-1,lvl_h-1,fc)
+ line(rm_l,rm_f,rm_r-1,rm_f,hc)
+ -- cut out floor pits
  for pt in all(pits) do
   rectfill(pt.x,rm_f,
    pt.x+pt.w-1,lvl_h-1,0)
-  -- goal pit: green edges, hazard: normal
-  local c=pt.goal and 11 or 6
+  local c=pt.goal and 11 or hc
   line(pt.x-1,rm_f,pt.x-1,lvl_h-1,c)
   line(pt.x+pt.w,rm_f,pt.x+pt.w,lvl_h-1,c)
-  -- goal pit: arrow indicator
   if pt.goal then
    local ax=pt.x+pt.w/2
-   -- down arrow
    line(ax,rm_f+3,ax,rm_f+10,11)
    line(ax-3,rm_f+7,ax,rm_f+10,11)
    line(ax+3,rm_f+7,ax,rm_f+10,11)
   end
  end
  -- ceiling
- rectfill(0,0,lvl_w-1,rm_t-1,5)
+ rectfill(0,0,lvl_w-1,rm_t-1,fc)
+ -- cut out ceiling hole
+ if ceil_hole then
+  rectfill(ceil_hole.x,0,
+   ceil_hole.x+ceil_hole.w-1,rm_t-1,0)
+  line(ceil_hole.x-1,0,
+   ceil_hole.x-1,rm_t,hc)
+  line(ceil_hole.x+ceil_hole.w,0,
+   ceil_hole.x+ceil_hole.w,rm_t,hc)
+ end
  -- walls
- rectfill(0,0,rm_l-1,lvl_h-1,5)
- rectfill(rm_r,0,lvl_w-1,lvl_h-1,5)
- line(rm_l,rm_t,rm_r-1,rm_t,6)
- line(rm_l,rm_t,rm_l,rm_f,6)
- line(rm_r-1,rm_t,rm_r-1,rm_f,6)
+ rectfill(0,0,rm_l-1,lvl_h-1,fc)
+ rectfill(rm_r,0,lvl_w-1,lvl_h-1,fc)
+ line(rm_l,rm_t,rm_r-1,rm_t,hc)
+ line(rm_l,rm_t,rm_l,rm_f,hc)
+ line(rm_r-1,rm_t,rm_r-1,rm_f,hc)
  -- platforms
  for pl in all(platforms) do
   rectfill(pl.x,pl.y,
-   pl.x+pl.w-1,pl.y+pl.h-1,5)
-  line(pl.x,pl.y,pl.x+pl.w-1,pl.y,6)
+   pl.x+pl.w-1,pl.y+pl.h-1,fc)
+  line(pl.x,pl.y,pl.x+pl.w-1,pl.y,hc)
  end
 end
