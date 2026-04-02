@@ -2,8 +2,51 @@
 function draw_hud()
  -- floor depth (top-left)
  print("floor "..(lvl_depth+1),2,2,6)
+ -- hp hearts (top-left, below floor)
+ draw_hearts()
+ -- ammo count (top-right)
+ draw_ammo()
  -- slide cooldown indicator (bottom-right)
  draw_slide_cd()
+end
+
+function draw_hearts()
+ for i=1,p_hp_max do
+  local hx=2+(i-1)*9
+  local hy=10
+  if i<=p.hp then
+   draw_heart(hx,hy,8) -- filled red
+  else
+   draw_heart(hx,hy,2) -- empty dark
+  end
+ end
+end
+
+-- draw a small heart at x,y
+function draw_heart(x,y,c)
+ -- 7px wide, 6px tall pixel heart
+ pset(x+1,y,c)
+ pset(x+2,y,c)
+ pset(x+4,y,c)
+ pset(x+5,y,c)
+ line(x,y+1,x+6,y+1,c)
+ line(x,y+2,x+6,y+2,c)
+ line(x+1,y+3,x+5,y+3,c)
+ line(x+2,y+4,x+4,y+4,c)
+ pset(x+3,y+5,c)
+end
+
+function draw_ammo()
+ local txt=p.ammo.."/"..gun_max
+ local tx=126-#txt*4
+ if p.reloading then
+  -- blink during reload
+  local c=6
+  if p.anim_t%10<5 then c=8 end
+  print(txt,tx,2,c)
+ else
+  print(txt,tx,2,7)
+ end
 end
 
 function draw_slide_cd()

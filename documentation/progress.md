@@ -81,9 +81,9 @@
 - [ ] Item placeholder sprites
 
 ## Session 7 — HUD
-- [ ] HP hearts (top-left)
+- [x] HP hearts (top-left)
 - [ ] Deadeye meter (top-center, pulses when full)
-- [ ] Ammo count + gun icon (top-right)
+- [x] Ammo count (top-right, blinks during reload)
 - [ ] Item slots (top-right)
 - [ ] Slide cooldown indicator (bottom-right)
 - [ ] No visual overlap between HUD elements
