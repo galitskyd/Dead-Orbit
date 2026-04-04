@@ -5,13 +5,13 @@ __lua__
 #include src/particles.lua
 #include src/state.lua
 #include src/input.lua
+#include src/room.lua
 #include src/camera.lua
 #include src/slide.lua
 #include src/bullets.lua
+#include src/enemies.lua
 #include src/guns.lua
 #include src/player.lua
-#include src/enemies.lua
-#include src/room.lua
 #include src/ui.lua
 #include src/main.lua
 __gfx__

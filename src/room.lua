@@ -1,226 +1,212 @@
 -- === room / map ===
-platforms={}
-pits={}
-goal_pit=nil
-ceil_hole=nil -- ceiling gap where player drops in
+tile_sz=8
+map_w=0
+map_h=0
+map_tiles={} -- [y][x]: 0=air,1=solid,2=platform
+spawn_pts={}
+lvl_w=0
+lvl_h=0
 
-function generate_level()
- platforms={}
- pits={}
- ceil_hole=nil
+-- tile char lookup
+t_chars={
+ ["#"]=1,["-"]=2,["."]=0,
+ ["S"]=0,["G"]=0,["C"]=0,
+ ["L"]=0,["T"]=0
+}
+s_chars={
+ S="player",G="grunt",C="crawler",
+ L="lurker",T="turret"
+}
 
- -- goal pit on far side from spawn
- if lvl_dir==1 then
-  goal_pit={x=rm_r-34,w=30,goal=true}
- else
-  goal_pit={x=rm_l+4,w=30,goal=true}
- end
- add(pits,goal_pit)
+-- === room data ===
+room1={
+ "################################################",
+ "#..............................................#",
+ "#..............L...................L...........#",
+ "#..............................................#",
+ "#..............................................#",
+ "#..............................................#",
+ "#.....-------.........-------.....-------......#",
+ "#..............................................#",
+ "#..............................................#",
+ "#.................--------.....................#",
+ "#..............................................#",
+ "#..............................................#",
+ "#.....CC...-------.......T...-------...........#",
+ "#..............................................#",
+ "#S.......G...............G...........G.........#",
+ "################################################"
+}
 
- -- ceiling hole on spawn side (after first floor)
- if lvl_depth>0 then
-  if lvl_dir==1 then
-   ceil_hole={x=rm_l+4,w=30}
-  else
-   ceil_hole={x=rm_r-34,w=30}
-  end
- end
+-- === load & parse ===
 
- gen_hazard_pits()
- gen_platforms()
-end
-
--- safe zone boundaries (spawn side)
-function safe_zone()
- if lvl_dir==1 then
-  return rm_l,rm_l+80
- else
-  return rm_r-80,rm_r
- end
-end
-
--- middle zone (between safe zone and goal pit)
-function mid_zone()
- if lvl_dir==1 then
-  return rm_l+90,rm_r-50
- else
-  return rm_l+50,rm_r-90
- end
-end
-
--- level colors: red theme after floor 9
-function lvl_col()
- if lvl_depth>=9 then
-  return 2,8 -- dark red fill, red highlight
- end
- return 5,6 -- dark purple fill, light purple highlight
-end
-
--- === hazard pit generation ===
-
-function gen_hazard_pits()
- local ml,mr=mid_zone()
- local count=flr(rnd(3)) -- 0-2 hazard pits
- for i=1,count do
-  for try=1,10 do
-   local px=ml+flr(rnd(mr-ml-30))
-   local pw=20+flr(rnd(10))
-   if not pit_conflicts(px,pw) then
-    add(pits,{x=px,w=pw})
-    break
+function load_room(room)
+ map_h=#room
+ map_w=#room[1]
+ lvl_w=map_w*tile_sz
+ lvl_h=map_h*tile_sz
+ map_tiles={}
+ spawn_pts={}
+ for y=0,map_h-1 do
+  map_tiles[y]={}
+  local row=room[y+1]
+  for x=0,map_w-1 do
+   local ch=sub(row,x+1,x+1)
+   map_tiles[y][x]=t_chars[ch] or 0
+   if s_chars[ch] then
+    add(spawn_pts,{
+     type=s_chars[ch],tx=x,ty=y
+    })
    end
   end
  end
 end
 
-function pit_conflicts(px,pw)
- for pt in all(pits) do
-  if px<pt.x+pt.w+60
-  and px+pw>pt.x-60 then
-   return true
-  end
+-- === tile helpers ===
+
+function get_tile(tx,ty)
+ if tx<0 or tx>=map_w
+ or ty<0 or ty>=map_h then
+  return 1 -- out of bounds=solid
  end
- return false
+ return map_tiles[ty][tx]
 end
 
--- === platform generation ===
+function solid_at(wx,wy)
+ return get_tile(
+  flr(wx/tile_sz),
+  flr(wy/tile_sz))==1
+end
 
-function gen_platforms()
- local ml,mr=mid_zone()
- local x=ml+flr(rnd(20))
- while x<mr-30 do
-  local r=rnd(1)
-  if r<0.3 then
-   -- staircase
-   local steps=2+flr(rnd(2))
-   local sy=rm_f-16-flr(rnd(16))
-   for s=0,steps-1 do
-    local sx=x+s*24
-    local step_y=sy-s*16
-    if step_y>rm_t+20
-    and sx+32<rm_r
-    and not span_hits_pit(sx,32) then
-     add_plat(sx,step_y,32,4)
-    end
+-- find ground y below tile pos
+function find_ground(tx,ty)
+ for y=ty+1,map_h-1 do
+  if get_tile(tx,y)==1 then
+   return y*tile_sz
+  end
+ end
+ return map_h*tile_sz
+end
+
+-- === tile collision ===
+
+function collide_x(obj)
+ local ty1=flr(obj.y/tile_sz)
+ local ty2=flr((obj.y+obj.h-1)/tile_sz)
+ -- right
+ local rtx=flr((obj.x+obj.w)/tile_sz)
+ for ty=ty1,ty2 do
+  if get_tile(rtx,ty)==1 then
+   obj.x=rtx*tile_sz-obj.w
+   if obj.vx and obj.vx>0 then
+    obj.vx=0
    end
-   x+=steps*24+20+flr(rnd(20))
-  elseif r<0.7 then
-   -- floating platform
-   local pw=32+flr(rnd(24))
-   local py=rm_t+24+flr(rnd(rm_f-rm_t-48))
-   if x+pw<rm_r
-   and not span_hits_pit(x,pw) then
-    add_plat(x,py,pw,4)
+   break
+  end
+ end
+ -- left
+ local ltx=flr(obj.x/tile_sz)
+ for ty=ty1,ty2 do
+  if get_tile(ltx,ty)==1 then
+   obj.x=(ltx+1)*tile_sz
+   if obj.vx and obj.vx<0 then
+    obj.vx=0
    end
-   x+=pw+20+flr(rnd(30))
-  else
-   x+=30+flr(rnd(40))
+   break
   end
  end
 end
 
-function span_hits_pit(x,w)
- for pt in all(pits) do
-  if x<pt.x+pt.w+4 and x+w>pt.x-4 then
-   return true
+function collide_y(obj)
+ if obj.vy>=0 then
+  -- falling: solid + platform
+  local by=obj.y+obj.h
+  local prev_by=by-obj.vy
+  local tx1=flr(obj.x/tile_sz)
+  local tx2=flr((obj.x+obj.w-1)/tile_sz)
+  local ty=flr(by/tile_sz)
+  for tx=tx1,tx2 do
+   local t=get_tile(tx,ty)
+   if t==1 then
+    obj.y=ty*tile_sz-obj.h
+    obj.vy=0
+    obj.grounded=true
+    return
+   elseif t==2
+   and prev_by<=ty*tile_sz then
+    obj.y=ty*tile_sz-obj.h
+    obj.vy=0
+    obj.grounded=true
+    return
+   end
+  end
+ elseif obj.vy<0 then
+  -- rising: solid only
+  local tx1=flr(obj.x/tile_sz)
+  local tx2=flr((obj.x+obj.w-1)/tile_sz)
+  local ty=flr(obj.y/tile_sz)
+  for tx=tx1,tx2 do
+   if get_tile(tx,ty)==1 then
+    obj.y=(ty+1)*tile_sz
+    obj.vy=0
+    return
+   end
   end
  end
- return false
 end
 
-function add_plat(x,y,w,h)
- add(platforms,{x=x,y=y,w=w,h=h})
+-- edge detection for enemies
+function at_edge(obj,dir)
+ if not obj.grounded then return false end
+ local cx=dir==1 and obj.x+obj.w+2
+  or obj.x-2
+ local cy=obj.y+obj.h+1
+ return get_tile(
+  flr(cx/tile_sz),
+  flr(cy/tile_sz))~=1
 end
 
--- === pit helpers ===
+-- === spawn from map ===
 
-function is_pit(x)
- for pt in all(pits) do
-  if x>=pt.x and x<pt.x+pt.w then
-   return true
+function spawn_from_map()
+ enemies={}
+ e_projs={}
+ for sp in all(spawn_pts) do
+  local wx=sp.tx*tile_sz
+  local gy=find_ground(sp.tx,sp.ty)
+  if sp.type=="player" then
+   p.x=wx
+   p.y=gy-p.h
+  elseif sp.type=="grunt" then
+   spawn_grunt(wx,gy-16)
+  elseif sp.type=="crawler" then
+   spawn_crawler(wx,gy-8)
+  elseif sp.type=="lurker" then
+   spawn_lurker(wx,sp.ty*tile_sz)
+  elseif sp.type=="turret" then
+   spawn_turret(wx,gy-16)
   end
  end
- return false
 end
 
-function over_pit(x,w)
- return is_pit(x+w/2)
-end
-
-function over_goal_pit(x,w)
- local cx=x+w/2
- return cx>=goal_pit.x
-    and cx<goal_pit.x+goal_pit.w
-end
-
--- check if x is inside ceiling hole
-function in_ceil_hole(x,w)
- if not ceil_hole then return false end
- local cx=x+w/2
- return cx>=ceil_hole.x
-    and cx<ceil_hole.x+ceil_hole.w
-end
-
--- === platform collision ===
-
-function plat_collide(obj)
- if obj.vy<0 then return false end
- local feet=obj.y+obj.h
- local prev=feet-obj.vy
- for pl in all(platforms) do
-  if prev<=pl.y and feet>=pl.y
-  and obj.x+obj.w>pl.x
-  and obj.x<pl.x+pl.w then
-   obj.y=pl.y-obj.h
-   obj.vy=0
-   return true
-  end
- end
- return false
-end
-
--- === drawing ===
+-- === draw ===
 
 function draw_room()
- local fc,hc=lvl_col()
- -- floor
- rectfill(0,rm_f,lvl_w-1,lvl_h-1,fc)
- line(rm_l,rm_f,rm_r-1,rm_f,hc)
- -- cut out floor pits
- for pt in all(pits) do
-  rectfill(pt.x,rm_f,
-   pt.x+pt.w-1,lvl_h-1,0)
-  local c=pt.goal and 11 or hc
-  line(pt.x-1,rm_f,pt.x-1,lvl_h-1,c)
-  line(pt.x+pt.w,rm_f,pt.x+pt.w,lvl_h-1,c)
-  if pt.goal then
-   local ax=pt.x+pt.w/2
-   line(ax,rm_f+3,ax,rm_f+10,11)
-   line(ax-3,rm_f+7,ax,rm_f+10,11)
-   line(ax+3,rm_f+7,ax,rm_f+10,11)
+ for y=0,map_h-1 do
+  for x=0,map_w-1 do
+   local t=map_tiles[y][x]
+   local px=x*tile_sz
+   local py=y*tile_sz
+   if t==1 then
+    rectfill(px,py,
+     px+tile_sz-1,py+tile_sz-1,5)
+    if get_tile(x,y-1)~=1 then
+     line(px,py,px+tile_sz-1,py,6)
+    end
+   elseif t==2 then
+    line(px,py,px+tile_sz-1,py,6)
+    line(px,py+1,px+tile_sz-1,py+1,5)
+   end
   end
- end
- -- ceiling
- rectfill(0,0,lvl_w-1,rm_t-1,fc)
- -- cut out ceiling hole
- if ceil_hole then
-  rectfill(ceil_hole.x,0,
-   ceil_hole.x+ceil_hole.w-1,rm_t-1,0)
-  line(ceil_hole.x-1,0,
-   ceil_hole.x-1,rm_t,hc)
-  line(ceil_hole.x+ceil_hole.w,0,
-   ceil_hole.x+ceil_hole.w,rm_t,hc)
- end
- -- walls
- rectfill(0,0,rm_l-1,lvl_h-1,fc)
- rectfill(rm_r,0,lvl_w-1,lvl_h-1,fc)
- line(rm_l,rm_t,rm_r-1,rm_t,hc)
- line(rm_l,rm_t,rm_l,rm_f,hc)
- line(rm_r-1,rm_t,rm_r-1,rm_f,hc)
- -- platforms
- for pl in all(platforms) do
-  rectfill(pl.x,pl.y,
-   pl.x+pl.w-1,pl.y+pl.h-1,fc)
-  line(pl.x,pl.y,pl.x+pl.w-1,pl.y,hc)
  end
 end

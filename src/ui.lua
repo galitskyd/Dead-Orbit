@@ -1,19 +1,14 @@
 -- === ui / hud ===
 function draw_hud()
- -- floor depth (top-left)
- print("floor "..(lvl_depth+1),2,2,6)
- -- hp hearts (top-left, below floor)
  draw_hearts()
- -- ammo count (top-right)
  draw_ammo()
- -- slide cooldown indicator (bottom-right)
  draw_slide_cd()
 end
 
 function draw_hearts()
  for i=1,p_hp_max do
   local hx=2+(i-1)*9
-  local hy=10
+  local hy=2
   if i<=p.hp then
    draw_heart(hx,hy,8) -- filled red
   else
@@ -83,7 +78,6 @@ end
 function draw_gameover()
  cls(0)
  print("game over",46,38,8)
- print("reached floor "..(lvl_depth+1),34,50,6)
  print("press x to retry",32,70,6)
 end
 

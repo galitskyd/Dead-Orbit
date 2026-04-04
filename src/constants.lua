@@ -7,17 +7,7 @@ max_vy=4
 jump_spd=-4
 move_spd=1.5
 
--- level bounds (world coords)
--- 3x wider than original single screen
-lvl_w=384 -- 3 * 128
-lvl_h=128
-rm_l=8
-rm_r=lvl_w-8  -- 376
-rm_t=8
-rm_f=112
-
--- camera
-cam_dz=0.80 -- deadzone: inner 80% of screen
+-- (level bounds set by load_room)
 
 -- bullets
 blt_spd=3
@@ -27,13 +17,9 @@ blt_life=120 -- frames before despawn
 -- gun definitions {name,max_ammo,fire_cd,reload_dur,auto}
 gun_defs={
  revolver={name="revolver",max=6,cd=8,rld=30,auto=false},
- auto={name="auto",max=30,cd=15,rld=45,auto=true}
+ auto={name="auto",max=30,cd=5,rld=45,auto=true}
 }
 
--- legacy aliases (used in various places)
-gun_max=6
-gun_cd_max=8
-reload_dur=30
 
 -- gun drops
 gun_drop_chance=0.3 -- 30% chance grunt drops auto gun

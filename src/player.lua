@@ -2,21 +2,16 @@
 p={}
 
 function init_player()
- -- spawn on correct side based on direction
- if lvl_dir==1 then
-  p.x=rm_l+8
-  p.facing=1
- else
-  p.x=rm_r-24
-  p.facing=-1
- end
- p.y=rm_f-16
+ -- position set by spawn_from_map()
+ p.x=0
+ p.y=0
  p.w=16
  p.h=16
  p.vx=0
  p.vy=0
  p.grounded=true
  p.crouching=false
+ p.facing=1
  p.spr=0
  p.anim_t=0
  init_slide()
@@ -33,44 +28,17 @@ function init_player()
  p.hurt_t=0
 end
 
--- called when descending to next floor
-function drop_player()
- -- spawn above ceiling hole
- if lvl_dir==1 then
-  p.x=ceil_hole.x+7
-  p.facing=1
- else
-  p.x=ceil_hole.x+7
-  p.facing=-1
- end
- p.y=-16 -- above the screen/ceiling
- p.vy=2
- p.vx=0
- p.grounded=false
- p.crouching=false
- p.sliding=false
- p.slide_t=0
- p.iframe_t=0
- p.slide_cd=0
- bullets={}
- pickups={}
- -- keep current hp, ammo, and gun
-end
-
 function update_player()
  local moving=false
  p.crouching=false
 
- -- slide input (space key via stat(28))
+ -- slide input
  if key(" ") then
   start_slide()
  end
-
- -- update slide state
  update_slide()
 
  if not p.sliding then
-  -- horizontal movement (btn: 0=left,1=right)
   if btn(0) then
    p.vx=-move_spd
    p.facing=-1
@@ -85,14 +53,12 @@ function update_player()
    end
   end
 
-  -- jump (btn: 2=up)
   if btn(2) and p.grounded then
    spawn_dust(p.x,p.y+p.h)
    p.vy=jump_spd
    p.grounded=false
   end
 
-  -- crouch (btn: 3=down, ground only)
   if btn(3) and p.grounded then
    p.crouching=true
    p.vx=0
@@ -108,14 +74,13 @@ function update_player()
 
  local g=p.gun
 
- -- reload (r key via stat(28))
+ -- reload
  if key("r") and not p.reloading
  and p.ammo<g.max then
   p.reloading=true
   p.reload_t=g.rld
  end
 
- -- reload tick
  if p.reloading then
   p.reload_t-=1
   if p.reload_t<=0 then
@@ -130,7 +95,7 @@ function update_player()
   p.reload_t=g.rld
  end
 
- -- shoot: semi-auto uses key(), auto uses btn(5)
+ -- shoot
  local fire=false
  if g.auto then
   fire=btn(5)
@@ -144,51 +109,23 @@ function update_player()
   p.gun_cd=g.cd
  end
 
- -- gravity (always apply, floor/plat collision cancels)
+ -- gravity
  p.vy+=grav
  if p.vy>max_vy then p.vy=max_vy end
 
- -- apply velocity
+ -- movement + tile collision
  p.x+=p.vx
+ collide_x(p)
  p.y+=p.vy
  p.grounded=false
+ collide_y(p)
 
- -- platform collision (one-way from above)
- if p.vy>=0 and plat_collide(p) then
-  p.grounded=true
- end
-
- -- floor collision (skip if over pit)
- if p.y+p.h>rm_f
- and not over_pit(p.x,p.w) then
-  p.y=rm_f-p.h
-  p.vy=0
-  p.grounded=true
- end
-
- -- fell below level
+ -- fell off map
  if p.y>lvl_h+16 then
-  if over_goal_pit(p.x,p.w) then
-   advance_level()
-   return
-  else
-   p.hp=0
-   set_state("gameover")
-  end
+  p.hp=0
+  set_state("gameover")
  end
 
- -- ceiling collision (skip if inside ceiling hole)
- if p.y<rm_t
- and not in_ceil_hole(p.x,p.w) then
-  p.y=rm_t
-  if p.vy<0 then p.vy=0 end
- end
-
- -- wall collision
- if p.x<rm_l then p.x=rm_l end
- if p.x+p.w>rm_r then p.x=rm_r-p.w end
-
- -- update bullets
  update_bullets()
 
  -- animation
@@ -201,7 +138,7 @@ function update_player()
   p.spr=6
  elseif moving then
   local f=flr(p.anim_t/6)%2
-  p.spr=2+f*2 -- 2 or 4
+  p.spr=2+f*2
  else
   p.spr=0
  end
@@ -218,20 +155,20 @@ function hurt_player()
 end
 
 function draw_player()
- -- flash during i-frames or hurt invuln
- if (p.iframe_t>0 or p.hurt_t>0) and p.anim_t%4<2 then
+ if (p.iframe_t>0 or p.hurt_t>0)
+ and p.anim_t%4<2 then
   return
  end
  spr(p.spr,p.x,p.y,2,2,p.facing==-1)
  draw_player_gun()
 
- -- reload bar above head
  if p.reloading then
   local bx=p.x+2
   local by=p.y-5
   local bw=12
   local pct=1-p.reload_t/p.gun.rld
   rect(bx,by,bx+bw,by+2,7)
-  rectfill(bx+1,by+1,bx+flr(pct*(bw-1)),by+1,11)
+  rectfill(bx+1,by+1,
+   bx+flr(pct*(bw-1)),by+1,11)
  end
 end

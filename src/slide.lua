@@ -21,12 +21,10 @@ function start_slide()
 end
 
 function update_slide()
- -- cooldown tick
  if p.slide_cd>0 then
   p.slide_cd-=1
  end
 
- -- iframe tick (can outlast slide)
  if p.iframe_t>0 then
   p.iframe_t-=1
  end
@@ -37,8 +35,10 @@ function update_slide()
  p.slide_v*=(1-slide_fric)
  p.vx=p.slide_v*p.slide_dir
 
- -- wall stop
- if p.x<=rm_l or p.x+p.w>=rm_r then
+ -- wall stop: check tile ahead
+ local cx=p.slide_dir==1
+  and p.x+p.w+1 or p.x-1
+ if solid_at(cx,p.y+p.h/2) then
   p.sliding=false
   p.slide_cd=slide_cd_max
   p.vx=0

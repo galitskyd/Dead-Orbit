@@ -27,37 +27,19 @@
 - [ ] Deadeye: player can still move, shoot, and slide during slow-mo
 - [ ] Deadeye meter HUD element
 
-## Session 4 — Room System
-- [x] World coordinate system (entities use world-space x,y)
-- [x] Camera system with 80% deadzone scrolling
-- [x] Level expanded to 3x screen width (384px)
-- [x] Room drawing uses world-space bounds
-- [x] HUD draws in screen-space (unaffected by camera)
-- [x] One-way platforms (jump through from below, land on top)
-- [x] Enemy gravity + platform collision (shared enemy_physics())
-- [x] Grunts jump toward player when player is above them
-- [x] Pits — player falls through, dies below level
-- [x] Grunt pit avoidance (stops at edge), crawler reverses at edge
-- [x] Enemies that fall in pits are removed
-- [x] Procedural level generation (pits, platforms, staircases)
-- [x] Procedural enemy placement (ground, platforms, ceiling)
-- [x] Safe spawn zone (spawn side clear of hazards/enemies)
-- [x] Looping descent: goal pit on far side, jump in to advance
-- [x] Direction flips each floor (left→right, right→left)
-- [x] Enemy count scales with depth (grunts 2-6, crawlers 1-4 pairs, lurkers 1-3)
-- [x] Player keeps HP/ammo between floors, falls in from ceiling
-- [x] Goal pit has green edges + down arrow indicator
-- [x] Hazard pits in the middle still kill
-- [x] Floor counter on HUD and game over screen
-- [x] Ceiling hole on spawn side — player drops in from above
-- [x] Player spawns above ceiling, falls through hole into level
-- [x] Red color theme on floor 10+ (walls, floor, platforms)
-- [ ] Tilemap rendering
-- [ ] Platform collision
+## Session 4 — Room System (Tilemap Rewrite)
+- [x] String-based tilemap system (# = solid, - = platform, . = air)
+- [x] Spawn markers in map data (S=player, G=grunt, C=crawler, L=lurker, T=turret)
+- [x] Tile collision: collide_x, collide_y with solid + one-way platform support
+- [x] get_tile, solid_at, find_ground, at_edge helper functions
+- [x] Enemies and player use shared tile collision (replaces old boundary checks)
+- [x] Bullets and projectiles use solid_at for wall hits
+- [x] Slide wall-stop uses solid_at
+- [x] Camera follows player with centered deadzone
+- [x] Room1 defined: 48x16 tile room with platforms, enemies, player spawn
+- [x] Removed: procedural generation, level depth, floor advancement, pits, ceiling holes
 - [ ] Door lock / unlock logic (clears when enemies gone)
-- [ ] 2–3 hand-crafted room templates
-- [ ] Room shuffle logic for each floor
-- [ ] Lurker wall and ceiling anchor points in tileset
+- [ ] Additional hand-crafted room templates
 - [ ] Placeholder tiles replace `rectfill()` blocks
 
 ## Session 5 — Enemies

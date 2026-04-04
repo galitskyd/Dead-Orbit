@@ -7,19 +7,16 @@ function spawn_bullet()
  local bvx=blt_spd*p.facing
  local bvy=0
 
- -- offset spawn to front of player
  if p.facing==1 then
   bx=p.x+p.w+1
  else
   bx=p.x-5
  end
 
- -- angled shot during slide
  if p.sliding then
   bvy=slide_shot_vy
  end
 
- -- adjust spawn y for crouch
  if p.crouching then
   by=p.y+p.h/2+2
  end
@@ -37,9 +34,7 @@ function update_bullets()
   b.x+=b.vx
   b.y+=b.vy
   b.life-=1
-  -- wall/ceiling/floor collision
-  if b.x<rm_l or b.x>rm_r
-  or b.y<rm_t or b.y>rm_f then
+  if solid_at(b.x,b.y) then
    spawn_impact(b.x,b.y)
    del(bullets,b)
   elseif b.life<=0 then
