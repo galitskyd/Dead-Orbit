@@ -21,7 +21,11 @@ function init_player()
  p.anim_t=0
  init_slide()
  bullets={}
- p.ammo=gun_max
+ pickups={}
+ -- default weapon: revolver
+ p.gun_id="revolver"
+ p.gun=gun_defs.revolver
+ p.ammo=p.gun.max
  p.gun_cd=0
  p.reloading=false
  p.reload_t=0
@@ -49,7 +53,8 @@ function drop_player()
  p.iframe_t=0
  p.slide_cd=0
  bullets={}
- -- keep current hp and ammo
+ pickups={}
+ -- keep current hp, ammo, and gun
 end
 
 function update_player()
@@ -101,11 +106,13 @@ function update_player()
  -- gun cooldown
  if p.gun_cd>0 then p.gun_cd-=1 end
 
+ local g=p.gun
+
  -- reload (r key via stat(28))
  if key("r") and not p.reloading
- and p.ammo<gun_max then
+ and p.ammo<g.max then
   p.reloading=true
-  p.reload_t=reload_dur
+  p.reload_t=g.rld
  end
 
  -- reload tick
@@ -113,22 +120,28 @@ function update_player()
   p.reload_t-=1
   if p.reload_t<=0 then
    p.reloading=false
-   p.ammo=gun_max
+   p.ammo=g.max
   end
  end
 
  -- auto-reload on empty
  if p.ammo<=0 and not p.reloading then
   p.reloading=true
-  p.reload_t=reload_dur
+  p.reload_t=g.rld
  end
 
- -- shoot (x key via stat(28))
- if key("x") and not p.reloading
+ -- shoot: semi-auto uses key(), auto uses btn(5)
+ local fire=false
+ if g.auto then
+  fire=btn(5)
+ else
+  fire=key("x")
+ end
+ if fire and not p.reloading
  and p.gun_cd<=0 and p.ammo>0 then
   spawn_bullet()
   p.ammo-=1
-  p.gun_cd=gun_cd_max
+  p.gun_cd=g.cd
  end
 
  -- gravity (always apply, floor/plat collision cancels)
@@ -210,13 +223,14 @@ function draw_player()
   return
  end
  spr(p.spr,p.x,p.y,2,2,p.facing==-1)
+ draw_player_gun()
 
  -- reload bar above head
  if p.reloading then
   local bx=p.x+2
   local by=p.y-5
   local bw=12
-  local pct=1-p.reload_t/reload_dur
+  local pct=1-p.reload_t/p.gun.rld
   rect(bx,by,bx+bw,by+2,7)
   rectfill(bx+1,by+1,bx+flr(pct*(bw-1)),by+1,11)
  end

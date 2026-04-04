@@ -71,6 +71,20 @@
 - [x] Turret placeholder sprite
 - [x] All enemies: slide I-frame interaction verified
 
+## Session 5.5 — Weapon System
+- [x] Gun definitions table (revolver, auto gun) with per-gun stats
+- [x] Auto gun: 30-round clip, 0.5s fire delay, hold-to-fire
+- [x] Player starts with revolver, one weapon at a time
+- [x] Equip system: p.gun_id + p.gun reference to gun_defs
+- [x] Gun drops: grunts have 30% chance to drop auto gun on death
+- [x] Pickup system: walk over dropped gun to pick it up
+- [x] Dropping current gun when picking up new one (revolver not dropped)
+- [x] Placeholder auto gun drawn at end of player model (rectfill)
+- [x] Pickup bob animation on ground
+- [x] HUD shows gun name + ammo count
+- [x] Ammo drops scale per weapon (3 for revolver, 10 for auto)
+- [x] Gun persists across floor transitions
+
 ## Session 6 — Items & Inventory
 - [ ] Item pickup system
 - [ ] 3 item slots implemented

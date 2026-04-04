@@ -14,8 +14,9 @@ function spawn_ammo(x,y)
   x=x,y=y,vx=0,vy=-0.5,
   life=60,c=11
  })
- -- give player ammo
- p.ammo=min(p.ammo+3,gun_max)
+ -- give player ammo (scaled to gun)
+ local amt=p.gun_id=="auto" and 10 or 3
+ p.ammo=min(p.ammo+amt,p.gun.max)
 end
 
 -- === spawn functions ===
@@ -401,7 +402,11 @@ function kill_enemy(e)
  end
  spawn_impact(e.x+e.w/2,e.y+e.h/2)
  if e.type=="grunt" then
-  spawn_ammo(e.x+e.w/2,e.y)
+  if rnd(1)<gun_drop_chance then
+   spawn_gun_drop(e.x+e.w/2-4,e.y+4,"auto")
+  else
+   spawn_ammo(e.x+e.w/2,e.y)
+  end
  end
  del(enemies,e)
 end

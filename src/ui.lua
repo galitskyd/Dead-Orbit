@@ -37,15 +37,18 @@ function draw_heart(x,y,c)
 end
 
 function draw_ammo()
- local txt=p.ammo.."/"..gun_max
+ local gn=p.gun.name
+ local txt=p.ammo.."/"..p.gun.max
  local tx=126-#txt*4
+ -- gun name above ammo
+ local nx=126-#gn*4
+ print(gn,nx,2,13)
  if p.reloading then
-  -- blink during reload
   local c=6
   if p.anim_t%10<5 then c=8 end
-  print(txt,tx,2,c)
+  print(txt,tx,8,c)
  else
-  print(txt,tx,2,7)
+  print(txt,tx,8,7)
  end
 end
 

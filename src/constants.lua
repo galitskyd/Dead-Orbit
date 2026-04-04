@@ -19,13 +19,24 @@ rm_f=112
 -- camera
 cam_dz=0.80 -- deadzone: inner 80% of screen
 
--- bullets / revolver
+-- bullets
 blt_spd=3
 blt_spr=12 -- sprite index for bullet
 blt_life=120 -- frames before despawn
-gun_max=6 -- revolver capacity
-gun_cd_max=8 -- delay between shots (~0.27s at 30fps)
-reload_dur=30 -- reload time (~1s at 30fps)
+
+-- gun definitions {name,max_ammo,fire_cd,reload_dur,auto}
+gun_defs={
+ revolver={name="revolver",max=6,cd=8,rld=30,auto=false},
+ auto={name="auto",max=30,cd=15,rld=45,auto=true}
+}
+
+-- legacy aliases (used in various places)
+gun_max=6
+gun_cd_max=8
+reload_dur=30
+
+-- gun drops
+gun_drop_chance=0.3 -- 30% chance grunt drops auto gun
 
 -- slide
 slide_spd=2.5

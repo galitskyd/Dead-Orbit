@@ -22,6 +22,7 @@ function new_game()
  init_camera()
  init_enemies()
  particles={}
+ pickups={}
 end
 
 function advance_level()
@@ -115,6 +116,7 @@ function _update()
   end
   update_player()
   update_enemies()
+  update_pickups()
   update_particles()
   update_camera()
  elseif state=="pause" then
@@ -140,6 +142,7 @@ function _draw()
   draw_room()
   draw_enemies()
   draw_e_projs()
+  draw_pickups()
   draw_player()
   draw_bullets()
   draw_particles()
@@ -151,6 +154,7 @@ function _draw()
   draw_room()
   draw_enemies()
   draw_e_projs()
+  draw_pickups()
   draw_player()
   draw_bullets()
   draw_particles()

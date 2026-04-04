@@ -8,6 +8,7 @@ __lua__
 #include src/camera.lua
 #include src/slide.lua
 #include src/bullets.lua
+#include src/guns.lua
 #include src/player.lua
 #include src/enemies.lua
 #include src/room.lua
