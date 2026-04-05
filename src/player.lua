@@ -144,6 +144,20 @@ function update_player()
  end
 end
 
+-- player hurtbox based on stance
+function p_hurtbox()
+ if p.sliding then
+  -- low slide: 16x6 near ground
+  return p.x+2,p.y+10,12,6
+ elseif p.crouching then
+  -- crouch: 12x10 lower half
+  return p.x+2,p.y+6,12,10
+ else
+  -- standing/jumping: 12x14
+  return p.x+2,p.y+2,12,14
+ end
+end
+
 function hurt_player()
  if god_mode then return end
  if p.iframe_t>0 or p.hurt_t>0 then return end

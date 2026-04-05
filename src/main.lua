@@ -7,6 +7,7 @@ function _init()
  init_player()
  spawn_from_map()
  init_camera()
+ init_stars()
  state="title"
 end
 
@@ -15,6 +16,7 @@ function new_game()
  init_player()
  spawn_from_map()
  init_camera()
+ init_stars()
  particles={}
  pickups={}
 end
@@ -57,9 +59,11 @@ function _draw()
  elseif state=="game" then
   cls(0)
   camera(cam_x,0)
+  draw_stars()
   draw_room()
   draw_enemies()
   draw_e_projs()
+  draw_grenades()
   draw_pickups()
   draw_player()
   draw_bullets()
@@ -69,9 +73,11 @@ function _draw()
  elseif state=="pause" then
   cls(0)
   camera(cam_x,0)
+  draw_stars()
   draw_room()
   draw_enemies()
   draw_e_projs()
+  draw_grenades()
   draw_pickups()
   draw_player()
   draw_bullets()

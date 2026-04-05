@@ -3,7 +3,7 @@ bullets={}
 
 function spawn_bullet()
  local bx=p.x+p.w/2
- local by=p.y+p.h/2
+ local by=p.y+p.h/2+2
  local bvx=blt_spd*p.facing
  local bvy=0
 
@@ -18,7 +18,7 @@ function spawn_bullet()
  end
 
  if p.crouching then
-  by=p.y+p.h/2+2
+  by=p.y+p.h/2+4
  end
 
  add(bullets,{
@@ -34,7 +34,7 @@ function update_bullets()
   b.x+=b.vx
   b.y+=b.vy
   b.life-=1
-  if solid_at(b.x,b.y) then
+  if blocked_at(b.x,b.y) then
    spawn_impact(b.x,b.y)
    del(bullets,b)
   elseif b.life<=0 then

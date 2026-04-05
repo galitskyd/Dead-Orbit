@@ -86,6 +86,55 @@ function spawn_explosion(x,y)
  sfx(2)
 end
 
+function spawn_nade_explosion(x,y)
+ -- tall vertical column
+ for i=1,20 do
+  local l=15+flr(rnd(15))
+  add(particles,{
+   x=x+rnd(8)-4,y=y,
+   vx=rnd(1)-0.5,
+   vy=-1.5-rnd(4),
+   life=l,maxlife=l,
+   c=10,fade={10,9,8}
+  })
+ end
+ -- downward splash
+ for i=1,8 do
+  local l=10+flr(rnd(8))
+  add(particles,{
+   x=x+rnd(6)-3,y=y,
+   vx=rnd(1)-0.5,
+   vy=0.5+rnd(2),
+   life=l,maxlife=l,
+   c=9,fade={9,8,2}
+  })
+ end
+ -- medium horizontal spread
+ for i=1,14 do
+  local l=10+flr(rnd(10))
+  add(particles,{
+   x=x,y=y+rnd(4)-2,
+   vx=rnd(4)-2,
+   vy=-rnd(1),
+   life=l,maxlife=l,
+   c=10,fade={10,9,5}
+  })
+ end
+ -- plasma sparks
+ for i=1,8 do
+  local a=rnd(1)
+  local l=8+flr(rnd(8))
+  add(particles,{
+   x=x,y=y,
+   vx=cos(a)*1.5,
+   vy=sin(a)*1.5-1,
+   life=l,maxlife=l,
+   c=12,fade={12,13,1}
+  })
+ end
+ sfx(2)
+end
+
 function update_particles()
  for pt in all(particles) do
   pt.x+=pt.vx

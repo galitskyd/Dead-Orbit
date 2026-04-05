@@ -33,42 +33,34 @@ slide_cd_max=45 -- 1.5s cooldown at 30fps
 slide_shot_vy=-1.5 -- upward component for angled slide shots
 
 -- debug
-god_mode=true -- default: no damage taken
+god_mode=false -- default: no damage taken
 
 -- player hp
 p_hp_max=5
 p_hurt_cd=30 -- invuln after hit (~1s)
 
--- enemy sprites (2x2 each)
--- grunt=32, lurker=34, crawler=36, turret=38
-spr_grunt=32
-spr_lurker=34
+-- enemy sprites
+spr_grunt=32 -- 2x2
 spr_crawler=13 -- frame 1; frame 2 = 14
-spr_turret=38
 spr_eproj=30 -- enemy projectile (1x1)
-spr_glob=31 -- lurker plasma glob (1x1)
 
 -- grunt
 grunt_hp=3
 grunt_spd=0.4
 grunt_fire_cd=60 -- 2s at 30fps
 grunt_proj_spd=1.5
+grunt_retreat=40 -- back up if closer
+grunt_ideal=80  -- stop approaching
+grunt_nade_chance=0.12 -- 12% grenade
+grunt_sight=120 -- alert range in pixels
 
--- lurker
-lurker_hp=2
-lurker_charge_t=90 -- 3s charge
-lurker_glob_spd=1.0
-lurker_glob_grav=0.04
+-- grenade
+nade_tick=60  -- 2s fuse at 30fps
+nade_grav=0.15
+nade_bounce=0.4
+nade_dmg_r=14 -- damage radius
 
 -- crawler
 crawler_hp=1
 crawler_spd=1.2
 crawler_accel=0.08
-
--- turret
-turret_hp=5
-turret_burst=3
-turret_burst_cd=6 -- between burst shots
-turret_cooldown=90 -- 3s between bursts
-turret_proj_spd=2.0
-turret_range=80 -- los range in pixels
