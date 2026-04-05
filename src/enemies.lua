@@ -112,8 +112,10 @@ end
 function update_grunt(e)
  local ex=e.x+e.w/2
  local ey=e.y+e.h/2
- local dx=p.x-ex
- local dy=p.y-ey
+ local px=p.x+p.w/2
+ local py=p.y+p.h/2
+ local dx=px-ex
+ local dy=py-ey
  local dist=safe_dist(dx,dy)
 
  -- vision: range + los check
